@@ -78,7 +78,7 @@ void *listen_thread(void *ignore)
     if (bind(listen_sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         perror("can't bind"), exit(1);
     }
-    if (listen(listen_sock, 2) < 0) {
+    if (listen(listen_sock, 128) < 0) {
         perror("listen"), exit(1);
     }
 
@@ -138,9 +138,19 @@ int main(int argc, char **argv)
     //
     //  (hint: you only need to write a few lines of code here)
 
-    /* TODO: your code here */
+    pthread_t listener;
+    if (pthread_create(&listener, NULL, listen_thread, NULL) != 0) {
+        perror("create listener thread");
+        exit(1);
+    }
 
-
+    pthread_t workers[num_thread];
+    for (int i = 0; i < num_thread; i++) {
+        if (pthread_create(&workers[i], NULL, worker, &args) != 0) {
+            perror("create worker thread");
+            exit(1);
+        }
+    }
 
 
     // main thread: getting cmd from admin
