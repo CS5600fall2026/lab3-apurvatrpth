@@ -40,7 +40,7 @@ void handle_write(int sock, struct request *rq, kvstore_t *kv)
     char buf[len+1];
 
     for (void *ptr = buf, *max = ptr+len; ptr < max; ) {
-        n = read(sock, buf, len);
+        n = read(sock, ptr, max - ptr);
         if (n <= 0)
             break;
         ptr += n;
@@ -89,6 +89,7 @@ void handle_read(int sock, struct request *rq, kvstore_t *kv)
         trace(msg);
 
         resp_okay(sock, rq, size, ret);
+        free(ret);  // kv_read returns a copy
     }
 }
 
