@@ -1,55 +1,66 @@
+
 #include "stats.h"
 
-// Exercise 3: fix concurrency bugs by Monitor
-
-// FIXME:
-// These statistics should be implemented as a Monitor,
-// which keeps track of dbserver's status
+// Exercise 3: stats implemented as a monitor.
+// every function takes stats_lock on entry and releases it before return.
 
 int n_writes = 0;  // number of writes
 int n_reads = 0;   // number of reads
 int n_deletes = 0; // number of deletes
 int n_fails = 0;   // number of failed operations
 
+static pthread_mutex_t stats_lock = PTHREAD_MUTEX_INITIALIZER;
 
-// TODO: define your synchronization variables here
-// (hint: don't forget to initialize them)
-
-/* your code here */
-
-
-// FIXME: implementation below is not thread-safe.
-// Fix this by implementing a Monitor.
 
 void inc_write() {
+    pthread_mutex_lock(&stats_lock);
     n_writes++;
+    pthread_mutex_unlock(&stats_lock);
 }
 
 void inc_read() {
+    pthread_mutex_lock(&stats_lock);
     n_reads++;
+    pthread_mutex_unlock(&stats_lock);
 }
 
 void inc_delete() {
+    pthread_mutex_lock(&stats_lock);
     n_deletes++;
+    pthread_mutex_unlock(&stats_lock);
 }
 
 void inc_fail() {
+    pthread_mutex_lock(&stats_lock);
     n_fails++;
+    pthread_mutex_unlock(&stats_lock);
 }
 
 
 int get_writes() {
-    return n_writes;
+    pthread_mutex_lock(&stats_lock);
+    int n = n_writes;
+    pthread_mutex_unlock(&stats_lock);
+    return n;
 }
 
 int get_reads() {
-    return n_reads;
+    pthread_mutex_lock(&stats_lock);
+    int n = n_reads;
+    pthread_mutex_unlock(&stats_lock);
+    return n;
 }
 
 int get_deletes() {
-    return n_deletes;
+    pthread_mutex_lock(&stats_lock);
+    int n = n_deletes;
+    pthread_mutex_unlock(&stats_lock);
+    return n;
 }
 
 int get_fails() {
-    return n_fails;
+    pthread_mutex_lock(&stats_lock);
+    int n = n_fails;
+    pthread_mutex_unlock(&stats_lock);
+    return n;
 }
